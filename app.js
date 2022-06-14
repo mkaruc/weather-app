@@ -3,9 +3,8 @@ const cityForm=document.querySelector(".top-banner form")
 const messageCity = document.querySelector(".top-banner .msg");
 const list = document.querySelector(".ajax-section .cities");
 const submitBtn= document.querySelector(".submitButton");
-const apiKey= "4d8fb5b93d4af21d66a2948710284366";
-const endpoint =`http://api.openweathermap.org/data/2.5/weather?q=${inputWord}&units=metric&appid=6074446325042a7eaf05b7bf76ae58e0`
- form.addEventListener("submit",element => {
+const apiKey= "6074446325042a7eaf05b7bf76ae58e0";
+cityForm.addEventListener("submit",element => {
     element.preventDefault();
     let inputValue=inputWord.value;
 
@@ -15,18 +14,32 @@ const endpoint =`http://api.openweathermap.org/data/2.5/weather?q=${inputWord}&u
     if (cityListArray.length > 0) {
         const filteredArray = cityListArray.filter(el => {
           let content = "";
+          if (inputValue.includes(",")) {
+            if (inputValue.split(",")[1].length > 2) {
+                inputValue = inputValue.split(",")[0];
+              content = el
+                .querySelector(".city-name span")
+                .textContent.toLowerCase();
+            } else {
+              content = el.querySelector(".city-name").dataset.name.toLowerCase();
+            }
+          } else {
+            content = el.querySelector(".city-name span").textContent.toLowerCase();
+          }
           return content == inputValue.toLowerCase();
         });
+    
 
     if (filteredArray.length > 0) {
         messageCity.textContent = `You already know the weather for ${
         filteredArray[0].querySelector(".city-name span").textContent
       } ...otherwise be more specific by providing the country code as well 😉`;
-      form.reset();
-      input.focus();
+      cityForm.reset();
+      inputWord.focus();
       return;
-    }
-    fetch(endpoint)
+    }}
+    const url = `https://api.openweathermap.org/data/2.5/weather?q=${inputValue}&appid=${apiKey}&units=metric`;
+    fetch(url)
       .then(response => response.json())
       .then(data => {
         const { main, name, sys, weather } = data;
@@ -59,4 +72,4 @@ const endpoint =`http://api.openweathermap.org/data/2.5/weather?q=${inputWord}&u
     messageCity.textContent = "";
     cityForm.reset();
     inputWord.focus();
-  });
+    });
